@@ -40,12 +40,6 @@ class RegisterAttendeeRequest extends FormRequest
 
                 if ($event->attendees()->where('email', $this->email)->exists()) {
                     $validator->errors()->add('email', 'This email is already registered for this event.');
-
-                    return;
-                }
-
-                if ($event->attendees()->count() >= $event->capacity) {
-                    $validator->errors()->add('email', 'This event has reached capacity.');
                 }
             },
         ];
