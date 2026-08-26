@@ -106,3 +106,18 @@ test('registration is rejected once the event is at capacity', function () {
     expect($event->attendees()->count())->toBe(1);
     expect(Attendee::where('email', 'jane@example.com')->exists())->toBeFalse();
 });
+
+test('registration succeeds when the event still has capacity remaining', function () {
+    $event = Event::factory()->create(['capacity' => 2]);
+    $event->attendees()->attach(Attendee::factory()->create());
+
+    $response = $this->post(route('events.attendees.store', $event), [
+        'name' => 'Jane Doe',
+        'email' => 'jane@example.com',
+    ]);
+
+    $response->assertRedirect(route('events.show', $event));
+    $response->assertSessionDoesntHaveErrors();
+    expect($event->attendees()->count())->toBe(2);
+    expect($event->attendees()->where('email', 'jane@example.com')->exists())->toBeTrue();
+});

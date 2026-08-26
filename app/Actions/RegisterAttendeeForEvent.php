@@ -13,7 +13,7 @@ class RegisterAttendeeForEvent
      * Register an attendee for the given event.
      *
      * Runs inside a locked transaction so concurrent registrations can't
-     * both pass the duplicate-registration check.
+     * both pass the duplicate/capacity checks and overbook the event.
      *
      * @param  array{name: string, email: string}  $data
      */
@@ -30,6 +30,12 @@ class RegisterAttendeeForEvent
             if ($lockedEvent->attendees()->whereKey($attendee->id)->exists()) {
                 throw ValidationException::withMessages([
                     'email' => 'This email is already registered for this event.',
+                ]);
+            }
+
+            if ($lockedEvent->attendees()->count() >= $lockedEvent->capacity) {
+                throw ValidationException::withMessages([
+                    'email' => 'This event has reached capacity.',
                 ]);
             }
 
