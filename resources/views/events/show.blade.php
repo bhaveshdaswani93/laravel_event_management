@@ -6,7 +6,9 @@
     <div class="mb-6 flex items-center justify-between">
         <h1 class="text-2xl font-semibold">{{ $event->title }}</h1>
         <div class="flex items-center gap-4">
-            <a href="{{ route('events.edit', $event) }}" class="text-sm text-gray-600 hover:underline">Edit</a>
+            @can('update', $event)
+                <a href="{{ route('events.edit', $event) }}" class="text-sm text-gray-600 hover:underline">Edit</a>
+            @endcan
             <a href="{{ route('events.index') }}" class="text-sm text-gray-600 hover:underline">Back to Events</a>
         </div>
     </div>
@@ -32,11 +34,13 @@
         </dl>
     </div>
 
-    <form action="{{ route('events.destroy', $event) }}" method="POST" class="mt-6" onsubmit="return confirm('Delete this event?');">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="text-sm text-red-600 hover:underline">Delete Event</button>
-    </form>
+    @can('delete', $event)
+        <form action="{{ route('events.destroy', $event) }}" method="POST" class="mt-6" onsubmit="return confirm('Delete this event?');">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="text-sm text-red-600 hover:underline">Delete Event</button>
+        </form>
+    @endcan
 
     <div class="mt-10">
         <h2 class="mb-4 text-lg font-semibold">Attendees ({{ $event->attendees->count() }})</h2>

@@ -5,9 +5,11 @@
 @section('content')
     <div class="mb-6 flex items-center justify-between">
         <h1 class="text-2xl font-semibold">Events</h1>
-        <a href="{{ route('events.create') }}" class="rounded-md bg-gray-900 px-4 py-2 text-sm text-white hover:bg-black">
-            Create Event
-        </a>
+        @can('create', App\Models\Event::class)
+            <a href="{{ route('events.create') }}" class="rounded-md bg-gray-900 px-4 py-2 text-sm text-white hover:bg-black">
+                Create Event
+            </a>
+        @endcan
     </div>
 
     @if ($events->isEmpty())
@@ -34,13 +36,17 @@
                             <td class="px-4 py-2">{{ $event->starts_at->format('M j, Y g:i A') }}</td>
                             <td class="px-4 py-2">{{ $event->capacity }}</td>
                             <td class="px-4 py-2 text-right">
-                                <a href="{{ route('events.edit', $event) }}" class="text-gray-600 hover:underline">Edit</a>
+                                @can('update', $event)
+                                    <a href="{{ route('events.edit', $event) }}" class="text-gray-600 hover:underline">Edit</a>
+                                @endcan
 
-                                <form action="{{ route('events.destroy', $event) }}" method="POST" class="inline" onsubmit="return confirm('Delete this event?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="ml-2 text-red-600 hover:underline">Delete</button>
-                                </form>
+                                @can('delete', $event)
+                                    <form action="{{ route('events.destroy', $event) }}" method="POST" class="inline" onsubmit="return confirm('Delete this event?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="ml-2 text-red-600 hover:underline">Delete</button>
+                                    </form>
+                                @endcan
                             </td>
                         </tr>
                     @endforeach

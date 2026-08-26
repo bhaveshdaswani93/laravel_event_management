@@ -6,8 +6,11 @@ use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
 use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Attributes\Controllers\Authorize;
+use Illuminate\Routing\Attributes\Controllers\Middleware;
 use Illuminate\View\View;
 
+#[Middleware('auth', except: ['index', 'show'])]
 class EventController extends Controller
 {
     /**
@@ -23,6 +26,7 @@ class EventController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+    #[Authorize('create', Event::class)]
     public function create(): View
     {
         return view('events.create', ['event' => new Event]);
@@ -31,9 +35,10 @@ class EventController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    #[Authorize('create', Event::class)]
     public function store(StoreEventRequest $request): RedirectResponse
     {
-        $event = Event::create($request->validated());
+        $event = $request->user()->events()->create($request->validated());
 
         return redirect()->route('events.show', $event)
             ->with('status', 'Event created.');
@@ -52,6 +57,7 @@ class EventController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
+    #[Authorize('update', 'event')]
     public function edit(Event $event): View
     {
         return view('events.edit', ['event' => $event]);
@@ -60,6 +66,7 @@ class EventController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    #[Authorize('update', 'event')]
     public function update(UpdateEventRequest $request, Event $event): RedirectResponse
     {
         $event->update($request->validated());
@@ -71,6 +78,7 @@ class EventController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    #[Authorize('delete', 'event')]
     public function destroy(Event $event): RedirectResponse
     {
         $event->delete();

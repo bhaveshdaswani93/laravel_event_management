@@ -92,3 +92,17 @@ test('an existing attendee reuses their record when registering for another even
     expect(Attendee::count())->toBe(1);
     expect($event->attendees()->whereKey($attendee->id)->exists())->toBeTrue();
 });
+
+test('registration is rejected once the event is at capacity', function () {
+    $event = Event::factory()->create(['capacity' => 1]);
+    $event->attendees()->attach(Attendee::factory()->create());
+
+    $response = $this->post(route('events.attendees.store', $event), [
+        'name' => 'Jane Doe',
+        'email' => 'jane@example.com',
+    ]);
+
+    $response->assertSessionHasErrors(['email']);
+    expect($event->attendees()->count())->toBe(1);
+    expect(Attendee::where('email', 'jane@example.com')->exists())->toBeFalse();
+});

@@ -9,6 +9,9 @@ class UpdateEventRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     *
+     * Authorization is handled by the #[Authorize('update', 'event')] attribute
+     * on EventController::update(), via EventPolicy.
      */
     public function authorize(): bool
     {

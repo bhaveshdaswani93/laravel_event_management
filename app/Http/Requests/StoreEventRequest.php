@@ -9,6 +9,9 @@ class StoreEventRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     *
+     * Authorization is handled by the #[Authorize('create', Event::class)] attribute
+     * on EventController::store(), via EventPolicy.
      */
     public function authorize(): bool
     {
